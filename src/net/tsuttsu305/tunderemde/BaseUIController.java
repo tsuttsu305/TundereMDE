@@ -12,6 +12,7 @@ import javafx.scene.control.Button;
 import javafx.scene.control.MenuItem;
 import javafx.scene.control.TextArea;
 import javafx.scene.web.WebView;
+import net.tsuttsu305.tunderemde.util.TextUtil;
 
 public class BaseUIController implements Initializable{
     @SuppressWarnings("UnusedDeclaration")
@@ -20,6 +21,8 @@ public class BaseUIController implements Initializable{
     GithubRawMarkdownRender render;
 
     private File nowEditFile = null;
+    private boolean isTemp = false;
+    private boolean isEdited = false;
 
     @FXML private TextArea textArea;
     @FXML private WebView webView;
@@ -60,13 +63,14 @@ public class BaseUIController implements Initializable{
 
     @FXML
     public void onNew(){
-
+        newFile();
     }
 
-    private void newFile(){
+    public void newFile(){
         try {
             File tmp = File.createTempFile("TundereMDE_TMP", ".md.tmp");
             nowEditFile = tmp;
+            isTemp = true;
 
             textArea.setText("");
             webView.getEngine().loadContent("");
@@ -76,15 +80,55 @@ public class BaseUIController implements Initializable{
     }
 
     public void preview(){
-        Runnable r = () -> {
-            try {
-                webView.getEngine().loadContent(render.render(textArea.getText()));
-            } catch (IOException e) {
-                e.printStackTrace();
-            }
-        };
-
-        Thread t = new Thread(r);
-        t.start();
+        try {
+            webView.getEngine().loadContent(render.render(textArea.getText()));
+        } catch (IOException e) {
+            e.printStackTrace();
+        }
     }
+
+    public boolean chkEdited() {
+
+        String ftxt = null;
+        String atxt = null;
+        try {
+            ftxt = TextUtil.readTxtFile(nowEditFile, Charset);
+            atxt = textArea.getText();
+            isEdited = ftxt.equals(atxt) ? isEdited : true;
+        } catch (IOException e) {
+            e.printStackTrace();
+            // TODO Open New File Save Dialog
+        }
+
+        return isEdited;
+    }
+
+    public boolean isEdited(){
+        return isEdited;
+    }
+
+    private DialogStatus showSaveOrDestroyDialog(){
+        return DialogStatus.DIALOG_STATUS_OK;
+    }
+
+    public boolean save(){
+        if (isTemp){
+            //TODO FileSelect Dialog
+        }
+
+
+        return true;
+    }
+
+    public void open(){
+        if (chkEdited()){
+            //TODO Save?
+        }
+    }
+
+}
+enum DialogStatus{
+    DIALOG_STATUS_OK,
+    DIALOG_STATUS_Cansel;
+
 }
