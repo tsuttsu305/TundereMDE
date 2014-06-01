@@ -8,6 +8,8 @@ import javafx.scene.control.TextArea;
 import javafx.scene.web.WebView;
 import net.tsuttsu305.tunderemde.parser.GithubRawMarkdownRender;
 import net.tsuttsu305.tunderemde.util.TextUtil;
+import org.controlsfx.control.action.Action;
+import org.controlsfx.dialog.Dialogs;
 
 import java.io.File;
 import java.io.IOException;
@@ -31,6 +33,7 @@ public class BaseUIController implements Initializable{
 
     @Override
     public void initialize(URL location, ResourceBundle resources) {
+        System.out.println(showSaveOrDestroyDialog());
         try {
             render = new GithubRawMarkdownRender();
         } catch (IOException e) {
@@ -97,7 +100,6 @@ public class BaseUIController implements Initializable{
             isEdited = ftxt.equals(atxt) ? isEdited : true;
         } catch (IOException e) {
             e.printStackTrace();
-            // TODO Open New File Save Dialog
         }
 
         return isEdited;
@@ -107,10 +109,13 @@ public class BaseUIController implements Initializable{
         return isEdited;
     }
 
-//    private Action showSaveOrDestroyDialog(){
-//
-//        return DialogStatus.DIALOG_STATUS_OK;
-//    }
+    private Action showSaveOrDestroyDialog(){
+        return Dialogs.create()
+                .owner(Main.MainStage)
+                .title("保存しますか?")
+                .message("変更が保存されていません。\n保存しますか?")
+                .showConfirm();
+    }
 
     public boolean save(){
         if (isTemp){
