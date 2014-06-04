@@ -6,13 +6,14 @@ import javafx.scene.control.Button;
 import javafx.scene.control.MenuItem;
 import javafx.scene.control.TextArea;
 import javafx.scene.web.WebView;
+import javafx.stage.FileChooser;
 import net.tsuttsu305.tunderemde.parser.GithubRawMarkdownRender;
 import net.tsuttsu305.tunderemde.util.TextUtil;
 import org.controlsfx.control.action.Action;
+import org.controlsfx.dialog.Dialog;
 import org.controlsfx.dialog.Dialogs;
 
-import java.io.File;
-import java.io.IOException;
+import java.io.*;
 import java.net.URL;
 import java.util.ResourceBundle;
 
@@ -33,7 +34,6 @@ public class BaseUIController implements Initializable{
 
     @Override
     public void initialize(URL location, ResourceBundle resources) {
-        System.out.println(showSaveOrDestroyDialog());
         try {
             render = new GithubRawMarkdownRender();
         } catch (IOException e) {
@@ -57,15 +57,24 @@ public class BaseUIController implements Initializable{
     @FXML
     public void onOpen(){
 
+    open();
     }
 
     @FXML
     public void onSave(){
-
+        save();
     }
 
     @FXML
     public void onNew(){
+        if (chkEdited()){
+            Action a  = showSaveOrDestroyDialog();
+            if (a == Dialog.Actions.OK){
+                save();
+            }else if (a == Dialog.Actions.CANCEL){
+                return;
+            }
+        }
         newFile();
     }
 
@@ -119,16 +128,56 @@ public class BaseUIController implements Initializable{
 
     public boolean save(){
         if (isTemp){
-            //TODO FileSelect Dialog
+            FileChooser fc = new FileChooser();
+            fc.setTitle("Save File");
+            fc.getExtensionFilters().addAll(
+                    new FileChooser.ExtensionFilter("MarkdownText", "*.md"),
+                    new FileChooser.ExtensionFilter("ALL File", "*.*"));
+            File saveFile = fc.showSaveDialog(Main.MainStage);
+
+            if (saveFile == null)return false;
+
+            try {
+                saveFile.deleteOnExit();
+                saveFile.createNewFile();
+                nowEditFile = saveFile;
+            } catch (IOException e) {
+                e.printStackTrace();
+                return false;
+            }
+
         }
 
+        try (BufferedOutputStream bout = new BufferedOutputStream(new FileOutputStream(nowEditFile))) {
+            bout.write(textArea.getText().getBytes(Charset));
+            bout.flush();
+        } catch (IOException e) {
+            e.printStackTrace();
+            return false;
+        }
 
+        isEdited = false;
+        isTemp = false;
         return true;
     }
 
     public void open(){
         if (chkEdited()){
-            //TODO Save?
+            Action a  = showSaveOrDestroyDialog();
+            if (a == Dialog.Actions.OK){
+                save();
+            }
+        }
+        FileChooser fc = new FileChooser();
+        File f = fc.showOpenDialog(Main.MainStage);
+        if (f != null){
+            try {
+                nowEditFile = f;
+                String s = TextUtil.readTxtFile(f);
+                textArea.setText(s);
+            } catch (IOException e) {
+                e.printStackTrace();
+            }
         }
     }
 
