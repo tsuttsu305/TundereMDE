@@ -1,6 +1,10 @@
 package net.tsuttsu305.tunderemde.util;
 
+import net.tsuttsu305.tunderemde.BaseUIController;
+import org.mozilla.universalchardet.UniversalDetector;
+
 import java.io.*;
+import java.nio.charset.Charset;
 
 /**
  * Created by tsuttsu305 on 14/05/26.
@@ -35,12 +39,36 @@ public class TextUtil {
 
     /**
      * テキストファイルから文字列を読み込みます。</br>
-     * UTF-8で読み込みます
+     * 文字エンコードは自動判定します
      * @param f
      * @return
      * @throws IOException
      */
     public static String readTxtFile(File f) throws IOException {
-        return readTxtFile(f, "UTF-8");
+        BufferedInputStream bufin = new BufferedInputStream(new FileInputStream(f));
+        ByteArrayOutputStream byteout = new ByteArrayOutputStream();
+
+        byte[] buf = new byte[512];
+        int len = 0;
+        while ((len = bufin.read(buf)) != -1){
+            byteout.write(buf, 0, len);
+        }
+
+        bufin.close();
+        byte[] data = byteout.toByteArray();
+        byteout.close();
+
+        UniversalDetector detector = new UniversalDetector(null);
+        detector.handleData(data, 0, data.length);
+        detector.dataEnd();
+
+        String encoding = detector.getDetectedCharset();
+        if (encoding == null){
+            encoding = Charset.defaultCharset().toString();
+        }
+
+        BaseUIController.setCharset(encoding);
+
+        return new String(data, encoding);
     }
 }

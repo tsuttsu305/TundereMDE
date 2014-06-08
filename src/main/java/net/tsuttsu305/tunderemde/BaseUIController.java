@@ -1,10 +1,9 @@
 package net.tsuttsu305.tunderemde;
 
+import javafx.application.Platform;
 import javafx.fxml.FXML;
 import javafx.fxml.Initializable;
-import javafx.scene.control.Button;
-import javafx.scene.control.MenuItem;
-import javafx.scene.control.TextArea;
+import javafx.scene.control.*;
 import javafx.scene.web.WebView;
 import javafx.stage.FileChooser;
 import net.tsuttsu305.tunderemde.parser.GithubRawMarkdownRender;
@@ -13,13 +12,22 @@ import org.controlsfx.control.action.Action;
 import org.controlsfx.dialog.Dialog;
 import org.controlsfx.dialog.Dialogs;
 
-import java.io.*;
+import java.io.BufferedOutputStream;
+import java.io.File;
+import java.io.FileOutputStream;
+import java.io.IOException;
 import java.net.URL;
 import java.util.ResourceBundle;
 
 public class BaseUIController implements Initializable{
+    public static void setCharset(String charset) {
+        Charset = charset;
+        instance.charsetLabel.setText(charset);
+    }
+
     @SuppressWarnings("UnusedDeclaration")
     public static String Charset = "UTF-8";
+    public static BaseUIController instance;
 
     GithubRawMarkdownRender render;
 
@@ -31,9 +39,29 @@ public class BaseUIController implements Initializable{
     @FXML private WebView webView;
     @FXML private Button btn;
     @FXML private MenuItem close;
+    @FXML private Label charsetLabel;
+    @FXML private ToolBar toolbar;
 
     @Override
     public void initialize(URL location, ResourceBundle resources) {
+        instance = this;
+        setCharset("UTF-8");
+
+        Platform.runLater(() -> Main.MainStage.setOnCloseRequest(event -> {
+            if (chkEdited()){
+                Action a  = Dialogs.create()
+                        .owner(Main.MainStage)
+                        .title("保存しますか?")
+                        .masthead("保存しますか?")
+                        .message("変更を保存しますか?")
+                        .actions(Dialog.Actions.YES, Dialog.Actions.NO)
+                        .showConfirm();
+                if (a == Dialog.Actions.YES){
+                    save();
+                }
+            }
+        }));
+
         try {
             render = new GithubRawMarkdownRender();
         } catch (IOException e) {
@@ -51,6 +79,14 @@ public class BaseUIController implements Initializable{
 
     @FXML
     public void onClose(){
+        if (chkEdited()){
+            Action a  = showSaveOrDestroyDialog();
+            if (a == Dialog.Actions.OK){
+                save();
+            }else if (a == Dialog.Actions.CANCEL){
+                return;
+            }
+        }
         System.exit(0);
     }
 
@@ -86,6 +122,7 @@ public class BaseUIController implements Initializable{
 
             textArea.setText("");
             webView.getEngine().loadContent("");
+            BaseUIController.Charset = "UTF-8";
         } catch (IOException e) {
             e.printStackTrace();
         }
@@ -99,6 +136,7 @@ public class BaseUIController implements Initializable{
         }
     }
 
+    //FIXME SJISの時判定がうまく行かず、trueが返る
     public boolean chkEdited() {
 
         String ftxt = null;
@@ -106,10 +144,12 @@ public class BaseUIController implements Initializable{
         try {
             ftxt = TextUtil.readTxtFile(nowEditFile, Charset);
             atxt = textArea.getText();
-            isEdited = ftxt.equals(atxt) ? isEdited : true;
+            isEdited = !ftxt.equals(atxt) || isEdited;
         } catch (IOException e) {
             e.printStackTrace();
         }
+
+        System.out.println(ftxt.equals(atxt));
 
         return isEdited;
     }
@@ -166,8 +206,11 @@ public class BaseUIController implements Initializable{
             Action a  = showSaveOrDestroyDialog();
             if (a == Dialog.Actions.OK){
                 save();
+            }else if (a == Dialog.Actions.CANCEL){
+                return;
             }
         }
+
         FileChooser fc = new FileChooser();
         File f = fc.showOpenDialog(Main.MainStage);
         if (f != null){
