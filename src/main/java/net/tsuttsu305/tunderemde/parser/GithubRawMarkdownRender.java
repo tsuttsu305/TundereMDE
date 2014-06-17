@@ -34,7 +34,7 @@ public class GithubRawMarkdownRender {
         conn.setDoOutput(true);
         
         OutputStream output = conn.getOutputStream();
-        BufferedWriter writer = new BufferedWriter(new OutputStreamWriter(output));
+        BufferedWriter writer = new BufferedWriter(new OutputStreamWriter(output, "UTF-8"));
         writer.write(markdowntxt);
         writer.flush();
         writer.close();

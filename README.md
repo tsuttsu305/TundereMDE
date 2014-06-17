@@ -3,4 +3,4 @@ TundereMDE
 
 JavaFX Markdown Editor
 
-ライセンス: GNU GPLv3
+License: GNU GPLv3
