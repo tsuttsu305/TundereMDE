@@ -12,7 +12,7 @@ import java.net.URL;
  * GithubRawMarkdownRender (GithubRawMarkdownRender.java)
  * @author tsuttsu305
  */
-public class GithubRawMarkdownRender {
+public class GithubRawMarkdownRender implements IRender{
     private String css;
     
     public GithubRawMarkdownRender() throws IOException {
