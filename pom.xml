@@ -85,5 +85,12 @@
             <artifactId>juniversalchardet</artifactId>
             <version>1.0.3</version>
         </dependency>
+
+        <dependency>
+            <groupId>org.fxmisc.richtext</groupId>
+            <artifactId>richtextfx</artifactId>
+            <version>[0.4,)</version>
+            <type>jar</type>
+        </dependency>
     </dependencies>
 </project>

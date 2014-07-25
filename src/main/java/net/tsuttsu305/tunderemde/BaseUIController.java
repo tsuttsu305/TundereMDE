@@ -3,7 +3,12 @@ package net.tsuttsu305.tunderemde;
 import javafx.application.Platform;
 import javafx.fxml.FXML;
 import javafx.fxml.Initializable;
-import javafx.scene.control.*;
+import javafx.scene.control.Button;
+import javafx.scene.control.Label;
+import javafx.scene.control.MenuItem;
+import javafx.scene.control.ToolBar;
+import javafx.scene.input.MouseButton;
+import javafx.scene.input.MouseEvent;
 import javafx.scene.web.WebView;
 import javafx.stage.FileChooser;
 import net.tsuttsu305.tunderemde.parser.GithubRawMarkdownRender;
@@ -11,6 +16,8 @@ import net.tsuttsu305.tunderemde.util.TextUtil;
 import org.controlsfx.control.action.Action;
 import org.controlsfx.dialog.Dialog;
 import org.controlsfx.dialog.Dialogs;
+import org.fxmisc.richtext.CodeArea;
+import org.fxmisc.richtext.LineNumberFactory;
 
 import java.io.BufferedOutputStream;
 import java.io.File;
@@ -35,7 +42,7 @@ public class BaseUIController implements Initializable{
     private boolean isTemp = false;
     private boolean isEdited = false;
 
-    @FXML private TextArea textArea;
+    @FXML private CodeArea textArea;
     @FXML private WebView webView;
     @FXML private Button btn;
     @FXML private MenuItem close;
@@ -47,7 +54,12 @@ public class BaseUIController implements Initializable{
         instance = this;
         setCharset("UTF-8");
 
+        textArea.setEditable(true);
+        textArea.setWrapText(false);
+        textArea.setParagraphGraphicFactory(LineNumberFactory.get(textArea));
+
         Platform.runLater(() -> Main.MainStage.setOnCloseRequest(event -> {
+
             if (chkEdited()){
                 Action a  = Dialogs.create()
                         .owner(Main.MainStage)
@@ -69,6 +81,13 @@ public class BaseUIController implements Initializable{
         }
 
         newFile();
+    }
+
+    @FXML
+    public void onCodeClick(MouseEvent e){
+        if (e.getButton().equals(MouseButton.PRIMARY)){
+            textArea.requestFocus();
+        }
     }
 
     @FXML
@@ -120,7 +139,7 @@ public class BaseUIController implements Initializable{
             nowEditFile = tmp;
             isTemp = true;
 
-            textArea.setText("");
+            textArea.replaceText("");
             webView.getEngine().loadContent("");
             BaseUIController.Charset = "UTF-8";
         } catch (IOException e) {
@@ -154,6 +173,8 @@ public class BaseUIController implements Initializable{
         return isEdited;
     }
 
+    @SuppressWarnings("unused")
+    @Deprecated
     public boolean isEdited(){
         return isEdited;
     }
@@ -217,7 +238,7 @@ public class BaseUIController implements Initializable{
             try {
                 nowEditFile = f;
                 String s = TextUtil.readTxtFile(f);
-                textArea.setText(s);
+                textArea.replaceText(s);
             } catch (IOException e) {
                 e.printStackTrace();
             }

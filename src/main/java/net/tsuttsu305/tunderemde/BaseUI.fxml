@@ -1,10 +1,16 @@
 <?xml version="1.0" encoding="UTF-8"?>
 
+<?import org.fxmisc.richtext.*?>
+<?import java.lang.*?>
+<?import javafx.scene.input.*?>
+<?import javafx.scene.text.*?>
+<?import javafx.scene.web.*?>
 <?import javafx.scene.control.*?>
 <?import javafx.scene.input.KeyCodeCombination?>
 <?import javafx.scene.layout.*?>
 <?import javafx.scene.text.Font?>
 <?import javafx.scene.web.WebView?>
+
 <VBox prefHeight="324.0" prefWidth="414.0" xmlns="http://javafx.com/javafx/8" xmlns:fx="http://javafx.com/fxml/1" fx:controller="net.tsuttsu305.tunderemde.BaseUIController">
    <children>
       <MenuBar>
@@ -45,11 +51,11 @@
                     <content>
                       <AnchorPane minHeight="0.0" minWidth="0.0" prefHeight="200.0" prefWidth="200.0">
                            <children>
-                              <TextArea fx:id="textArea" layoutX="-8.0" layoutY="30.0" prefHeight="200.0" prefWidth="200.0" wrapText="true" AnchorPane.bottomAnchor="0.0" AnchorPane.leftAnchor="0.0" AnchorPane.rightAnchor="0.0" AnchorPane.topAnchor="0.0">
+                              <CodeArea fx:id="textArea" layoutX="-8.0" layoutY="30.0" onMouseClicked="#onCodeClick" prefHeight="200.0" prefWidth="200.0" style="-fx-fill: brown;" styleClass="code-area" AnchorPane.bottomAnchor="0.0" AnchorPane.leftAnchor="0.0" AnchorPane.rightAnchor="0.0" AnchorPane.topAnchor="0.0">
                                  <font>
                                     <Font name="Meiryo" size="12.0" />
                                  </font>
-                              </TextArea>
+                              </CodeArea>
                            </children>
                         </AnchorPane>
                     </content>
