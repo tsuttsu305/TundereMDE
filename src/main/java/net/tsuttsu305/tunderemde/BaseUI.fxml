@@ -39,6 +39,7 @@
       </MenuBar>
       <ToolBar fx:id="toolbar">
         <items>
+            <ChoiceBox fx:id="list" prefHeight="25.0" prefWidth="105.0" />
           <Button fx:id="btn" mnemonicParsing="false" onAction="#onPreviewBtn" text="Preview" />
             <Label fx:id="charsetLabel" />
         </items>

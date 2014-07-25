@@ -14,16 +14,26 @@ import java.net.URL;
  */
 public class GithubRawMarkdownRender implements IRender{
     private String css;
+
+    private static GithubRawMarkdownRender Instance = new GithubRawMarkdownRender();
     
-    public GithubRawMarkdownRender() throws IOException {
+    private GithubRawMarkdownRender(){
         Class<? extends GithubRawMarkdownRender> c = this.getClass();
         InputStream input = c.getResourceAsStream("github.css");
         BufferedReader br = new BufferedReader(new InputStreamReader(input));
         StringBuilder sb = new StringBuilder();
-        while (br.ready()) {
-            sb.append(br.readLine());
+        try {
+            while (br.ready()) {
+                sb.append(br.readLine());
+            }
+        } catch (IOException e) {
+            e.printStackTrace();
         }
         css = sb.toString();
+    }
+
+    public static GithubRawMarkdownRender getInstance(){
+        return Instance;
     }
     
     public String render(String markdowntxt) throws IOException{

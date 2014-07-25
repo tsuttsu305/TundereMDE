@@ -1,17 +1,20 @@
 package net.tsuttsu305.tunderemde;
 
 import javafx.application.Platform;
+import javafx.beans.value.ChangeListener;
+import javafx.beans.value.ObservableValue;
+import javafx.collections.FXCollections;
+import javafx.event.EventType;
 import javafx.fxml.FXML;
 import javafx.fxml.Initializable;
-import javafx.scene.control.Button;
-import javafx.scene.control.Label;
-import javafx.scene.control.MenuItem;
-import javafx.scene.control.ToolBar;
+import javafx.scene.control.*;
 import javafx.scene.input.MouseButton;
 import javafx.scene.input.MouseEvent;
 import javafx.scene.web.WebView;
 import javafx.stage.FileChooser;
 import net.tsuttsu305.tunderemde.parser.GithubRawMarkdownRender;
+import net.tsuttsu305.tunderemde.parser.IRender;
+import net.tsuttsu305.tunderemde.parser.MarkedJSParser;
 import net.tsuttsu305.tunderemde.util.TextUtil;
 import org.controlsfx.control.action.Action;
 import org.controlsfx.dialog.Dialog;
@@ -36,7 +39,8 @@ public class BaseUIController implements Initializable{
     public static String Charset = "UTF-8";
     public static BaseUIController instance;
 
-    GithubRawMarkdownRender render;
+    IRender render;
+    String[] renderlist = {"GithubAPI", "Marked.js"};
 
     private File nowEditFile = null;
     private boolean isTemp = false;
@@ -48,6 +52,7 @@ public class BaseUIController implements Initializable{
     @FXML private MenuItem close;
     @FXML private Label charsetLabel;
     @FXML private ToolBar toolbar;
+    @FXML private ChoiceBox list;
 
     @Override
     public void initialize(URL location, ResourceBundle resources) {
@@ -58,27 +63,39 @@ public class BaseUIController implements Initializable{
         textArea.setWrapText(false);
         textArea.setParagraphGraphicFactory(LineNumberFactory.get(textArea));
 
+        list.setItems(FXCollections.observableArrayList(renderlist));
+        list.getSelectionModel().select(0);
+
+        Platform.runLater(() -> list.getSelectionModel().selectedIndexProperty().addListener((observable, oldValue, newValue) -> {
+            switch (newValue.intValue()){
+                case 0:
+                    render = GithubRawMarkdownRender.getInstance();
+                    System.out.println("Github");
+                    break;
+                case 1:
+                    render = MarkedJSParser.getInstance();
+                    System.out.println("Marked,js");
+                    break;
+            }
+        }));
+
         Platform.runLater(() -> Main.MainStage.setOnCloseRequest(event -> {
 
-            if (chkEdited()){
-                Action a  = Dialogs.create()
+            if (chkEdited()) {
+                Action a = Dialogs.create()
                         .owner(Main.MainStage)
                         .title("保存しますか?")
                         .masthead("保存しますか?")
                         .message("変更を保存しますか?")
                         .actions(Dialog.Actions.YES, Dialog.Actions.NO)
                         .showConfirm();
-                if (a == Dialog.Actions.YES){
+                if (a == Dialog.Actions.YES) {
                     save();
                 }
             }
         }));
 
-        try {
-            render = new GithubRawMarkdownRender();
-        } catch (IOException e) {
-            e.printStackTrace();
-        }
+        render = GithubRawMarkdownRender.getInstance();
 
         newFile();
     }
@@ -150,7 +167,8 @@ public class BaseUIController implements Initializable{
     public void preview(){
         try {
             webView.getEngine().loadContent(render.render(textArea.getText()));
-        } catch (IOException e) {
+            webView.getEngine().reload();
+        } catch (Exception e) {
             e.printStackTrace();
         }
     }
