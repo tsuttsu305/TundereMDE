@@ -50,7 +50,9 @@ public class MarkedJSParser implements IRender{
         Object obj = function.invokeFunction("marked", md);
 
         if (obj instanceof String){
-            return (String)obj;
+            return "<html><link rel=\"stylesheet\" href=\"https://raw.githubusercontent.com/isagalaev/highlight.js/master/src/styles/dark.css\">\n" +
+                    "<script src=\"http://cdnjs.cloudflare.com/ajax/libs/highlight.js/8.1/highlight.min.js\"></script><script>hljs.initHighlightingOnLoad();</script>\n<meta charset=\"utf-8\"></head><body>"
+                    + (String)obj + "</body></html>";
         }else{
             return "Error";
         }

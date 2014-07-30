@@ -62,6 +62,7 @@ public class BaseUIController implements Initializable{
         textArea.setEditable(true);
         textArea.setWrapText(false);
         textArea.setParagraphGraphicFactory(LineNumberFactory.get(textArea));
+        textArea.editableProperty();
 
         list.setItems(FXCollections.observableArrayList(renderlist));
         list.getSelectionModel().select(0);
