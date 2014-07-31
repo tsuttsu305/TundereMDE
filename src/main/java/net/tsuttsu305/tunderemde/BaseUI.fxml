@@ -50,15 +50,7 @@
                <center>
                   <ScrollPane fitToHeight="true" fitToWidth="true" prefHeight="200.0" prefWidth="200.0" BorderPane.alignment="CENTER">
                     <content>
-                      <AnchorPane minHeight="0.0" minWidth="0.0" prefHeight="200.0" prefWidth="200.0">
-                           <children>
-                              <CodeArea fx:id="textArea" layoutX="-8.0" layoutY="30.0" onMouseClicked="#onCodeClick" prefHeight="200.0" prefWidth="200.0" style="-fx-fill: brown;" styleClass="code-area" AnchorPane.bottomAnchor="0.0" AnchorPane.leftAnchor="0.0" AnchorPane.rightAnchor="0.0" AnchorPane.topAnchor="0.0">
-                                 <font>
-                                    <Font name="Meiryo" size="12.0" />
-                                 </font>
-                              </CodeArea>
-                           </children>
-                        </AnchorPane>
+                      <AnchorPane fx:id="codeAnchor" minHeight="0.0" minWidth="0.0" prefHeight="200.0" prefWidth="200.0" />
                     </content>
                   </ScrollPane>
                </center>

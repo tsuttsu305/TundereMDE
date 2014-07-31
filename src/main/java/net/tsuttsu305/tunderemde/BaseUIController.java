@@ -10,11 +10,13 @@ import javafx.fxml.Initializable;
 import javafx.scene.control.*;
 import javafx.scene.input.MouseButton;
 import javafx.scene.input.MouseEvent;
+import javafx.scene.layout.AnchorPane;
 import javafx.scene.web.WebView;
 import javafx.stage.FileChooser;
 import net.tsuttsu305.tunderemde.parser.GithubRawMarkdownRender;
 import net.tsuttsu305.tunderemde.parser.IRender;
 import net.tsuttsu305.tunderemde.parser.MarkedJSParser;
+import net.tsuttsu305.tunderemde.ui.CodeTextArea;
 import net.tsuttsu305.tunderemde.util.TextUtil;
 import org.controlsfx.control.action.Action;
 import org.controlsfx.dialog.Dialog;
@@ -46,23 +48,32 @@ public class BaseUIController implements Initializable{
     private boolean isTemp = false;
     private boolean isEdited = false;
 
-    @FXML private CodeArea textArea;
+    private CodeArea textArea;
     @FXML private WebView webView;
     @FXML private Button btn;
     @FXML private MenuItem close;
     @FXML private Label charsetLabel;
     @FXML private ToolBar toolbar;
     @FXML private ChoiceBox list;
+    @FXML private AnchorPane codeAnchor;
 
     @Override
     public void initialize(URL location, ResourceBundle resources) {
         instance = this;
         setCharset("UTF-8");
 
+        textArea = new CodeTextArea();
+
         textArea.setEditable(true);
         textArea.setWrapText(false);
         textArea.setParagraphGraphicFactory(LineNumberFactory.get(textArea));
         textArea.editableProperty();
+
+        codeAnchor.getChildren().add(textArea);
+        AnchorPane.setTopAnchor(textArea, 0.0);
+        AnchorPane.setRightAnchor(textArea, 0.0);
+        AnchorPane.setBottomAnchor(textArea, 0.0);
+        AnchorPane.setLeftAnchor(textArea, 0.0);
 
         list.setItems(FXCollections.observableArrayList(renderlist));
         list.getSelectionModel().select(0);
